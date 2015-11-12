@@ -1,5 +1,5 @@
 #!/bin/sh
-exec scala -classpath "/home/quentin/Documents/TOP/Projet TOP/PROJET/2-API/imagewrapper_2.11-1.0.0.jar" "$0" "$@"
+exec scala -classpath "./source/API/imagewrapper_2.11-1.0.0.jar" "$0" "$@"
 !#
 
 
