@@ -10,7 +10,7 @@ object Main {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    var fileName : String = "sampleImage.jpg";
+    var fileName : String = "sampleImage2.png";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var image2D : Array[Array[Int]] = wrappedImage.getImage();
 
@@ -25,9 +25,6 @@ object Main {
       case 0 => return 1
       case _ => num * powInt(num, n-1)
     }
-    {
-
-    }
 
     def test_API() = {
 
@@ -39,7 +36,7 @@ object Main {
       println("The image width is: " + wrappedImage.width + " px.");
       for (row <- 0 to 40) {
         for (col <-0 to 80) {
-          image2D(row)(col) = 0x000000FF; // Set these pixels to RGB blue
+          image2D(row)(col) = 0xFF0000FF; // Set these pixels to RGB blue
         }
       }
       // Destination image file - Note that the image file name must contain the file type extension for the image to be saved correctly.
@@ -57,7 +54,7 @@ object Main {
       var blueValue = 0
       var greenValue = 0
       var redValue = 0
-      var greyValue = 0
+      var greyValue = 0.0
       for (row <- 0 to wrappedImage.height-1) {
         for (col <-0 to wrappedImage.width-1) {
           pixValue = src(row)(col)
@@ -69,10 +66,14 @@ object Main {
           pixValue -= redValue
           greenValue = greenValue / powInt(16,2)
           redValue = redValue / powInt(16,4)
-          print(blueValue,greenValue,redValue)
-          //src(row)(col) =
+          greyValue = 0.2125*redValue.toFloat+0.7154*greenValue.toFloat+0.0721*blueValue.toFloat //Méthode qualitative
+          //greyValue = 0.7154*greenValue.toFloat  //Méthode rapide
+          src(row)(col) = 0xFF000000 + greyValue.toInt + greyValue.toInt*powInt(16,2) + greyValue.toInt * powInt(16,4)
+
         }
       }
+      var outputFile : String = "outputImage.jpg";
+      wrappedImage.saveImage(outputFile);
     }
 
     def edgeDetection(src: Array[Array[Int]]) = {
