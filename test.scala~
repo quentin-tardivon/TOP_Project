@@ -15,7 +15,7 @@ println((value % pow(16,2)))
 println(value %pow(16,3))
 
 
-//Oulala, c'est moche, il faut merger tout ça!
+
 
 
   }
