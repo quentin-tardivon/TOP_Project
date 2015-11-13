@@ -12,11 +12,10 @@ Détection des routes:
     Niveau de gris valeur de 0 à 255, changement brutal de la valeur (travailler en relatif, chercher une ligne, puis vérifier que son homologue   existe.)
     Le recursif va surement intervenir ici, il faut analyser l'image par morceau
 
-  Idée 2: 
+  Idée 2:
 
-    Détection des angles, (analyse du milieu pour créer deux scénario?) 
+    Détection des angles, (analyse du milieu pour créer deux scénario?)
 
 Restitution:
 
 	Récupérer une matrice avec les routes indiquer par des 1 (des 0 là où il n'y a pas de routes), puis les superposé à l'image d'origine, d'une couleur différentes avec un indice de transparence si possible.
-
