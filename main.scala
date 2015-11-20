@@ -14,12 +14,12 @@ object Main {
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var image2D : Array[Array[Int]] = wrappedImage.getImage();
 
+    var fileName2 = "testimpo.png";
+    var wrappedImage2 = new ImageWrapper(fileName2);
+    var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
+
+
 ////////////////////////////////////////////////////////////////////////////////
-
-
-    def baseToInt(s: String, base: String): Int = {
-      s.toList.map(base.indexOf(_)).reduceLeft(_ * base.length + _)
-    }
 
     def powInt(num: Int, n: Int): Int = n match {
       case 0 => return 1
@@ -45,9 +45,29 @@ object Main {
       wrappedImage.saveImage(outputFile);
     }
 
-    def copy (src: Array[Array[Int]]) = {
-
+    def copy (src: Array[Array[Int]]) : Array[Array[Int]] = {   // faute dans l'argument ??
+      var tab = Array.ofDim[Int](src.length, src(0).length)   // matrice rempli de 0
+      for (i<-0 to src.length-1) {
+        for (j<-0 to src(0).length-1) {
+          tab(i)(j) = src(i)(j)
+        }
+      }
+      return tab
     }
+
+    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
+
+          for (row <- 0 to background.length-1) {
+            for (col <-0 to background(0).length-1) {
+              if (street(row)(col)%powInt(16,2) == 0){
+                background(row)(col) = 0xFF0000FF
+              }
+            }
+          }
+          var outputFile : String = "superpose.jpg";
+          wrappedImage.saveImage(outputFile);
+        }
+
 
     def greyLevel (src: Array[Array[Int]]) = { //Gris = 0.2125 Rouge + 0.7154 Vert + 0.0721 Bleu (en Int)
       var pixValue = 0
@@ -59,20 +79,16 @@ object Main {
         for (col <-0 to wrappedImage.width-1) {
           pixValue = src(row)(col)
           blueValue = pixValue% powInt(16,2)
-          pixValue -= blueValue
           greenValue = pixValue% powInt(16,4)
-          pixValue -= greenValue
           redValue = pixValue% powInt(16,6)
-          pixValue -= redValue
           greenValue = greenValue / powInt(16,2)
           redValue = redValue / powInt(16,4)
           greyValue = 0.2125*redValue.toFloat+0.7154*greenValue.toFloat+0.0721*blueValue.toFloat //Méthode qualitative
           //greyValue = 0.7154*greenValue.toFloat  //Méthode rapide
           src(row)(col) = 0xFF000000 + greyValue.toInt + greyValue.toInt*powInt(16,2) + greyValue.toInt * powInt(16,4)
-
         }
       }
-      var outputFile : String = "outputImage.jpg";
+      var outputFile : String = "outputImage2.jpg";
       wrappedImage.saveImage(outputFile);
     }
 
@@ -94,7 +110,14 @@ object Main {
 
 println(image2D(0)(0));
 
+var clone=copy(image2D)
+var outputFile = "outputImagecopie.jpg";
+wrappedImage.saveImage(outputFile);
+
 greyLevel(image2D);
+superImpoStreets(image2D,imagetest);
+//Regarder les API pour savoir comment imprimer clone
+
 
 ////////////////////////////////////////////////////////////////////////////////
 
