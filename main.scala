@@ -21,7 +21,7 @@ object Main {
       case _ => num * powInt(num, n-1)
     }
 
-    def test_API() = {
+    def test_API() = {                                                          //Just a test
 
 
       var fileName : String = "sampleImage.jpg";
@@ -40,7 +40,7 @@ object Main {
       wrappedImage.saveImage(outputFile);
     }
 
-    def copy (src: Array[Array[Int]]) : Array[Array[Int]] = {
+    def copy (src: Array[Array[Int]]) : Array[Array[Int]] = {                    //Done
       var tab = Array.ofDim[Int](src.length, src(0).length)
       for (i<-0 to src.length-1) {
         for (j<-0 to src(0).length-1) {
@@ -50,7 +50,7 @@ object Main {
       return tab
     }
 
-    def greyLevel (src: Array[Array[Int]]) = { //Gris = 0.2125 Rouge + 0.7154 Vert + 0.0721 Bleu (en Int)
+    def greyLevel (src: Array[Array[Int]]) = {                                   //Done
       var pixValue = 0
       var blueValue = 0
       var greenValue = 0
@@ -73,15 +73,20 @@ object Main {
       wrappedImage.saveImage(outputFile);
     }
 
-    def edgeDetection(src: Array[Array[Int]]) = {
+    def select_pixel(src: Array[Array[Int]], temp: Array[Array[Int]]) {
+      
+    }
+
+    def edgeDetection(src: Array[Array[Int]]) = {                               //To do
+      var tab = Array.ofDim[Int](src.length, src(0).length)
+      select_pixel(src,tab)
+    }
+
+    def traceStreets(src: Array[Array[Int]]) = {                                //To do
 
     }
 
-    def traceStreets(src: Array[Array[Int]]) = {
-
-    }
-
-    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) {
+    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) { //To do
 
     }
 
@@ -97,7 +102,7 @@ wrappedImage.saveImage(outputFile);
 
 greyLevel(image2D);
 
-//Regarder les API pour savoir comment imprimer clone
+//Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
 
 
 ////////////////////////////////////////////////////////////////////////////////
