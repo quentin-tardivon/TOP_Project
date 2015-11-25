@@ -13,6 +13,9 @@ object Main {
     var fileName : String = "sampleImage2.png";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var image2D : Array[Array[Int]] = wrappedImage.getImage();
+    var fileName2 : String = "testimpo.png"
+    var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
+    var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -69,25 +72,56 @@ object Main {
           src(row)(col) = 0xFF000000 + greyValue.toInt + greyValue.toInt*powInt(16,2) + greyValue.toInt * powInt(16,4)
         }
       }
-      var outputFile : String = "outputImage2.jpg";
+      var outputFile : String = "outputImage2.png";
       wrappedImage.saveImage(outputFile);
-    }
-
-    def select_pixel(src: Array[Array[Int]], temp: Array[Array[Int]]) {
-      
     }
 
     def edgeDetection(src: Array[Array[Int]]) = {                               //To do
       var tab = Array.ofDim[Int](src.length, src(0).length)
-      select_pixel(src,tab)
+
     }
 
     def traceStreets(src: Array[Array[Int]]) = {                                //To do
 
     }
 
-    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) { //To do
+    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
 
+          for (row <- 0 to background.length-1) {
+            for (col <-0 to background(0).length-1) {
+              if (street(row)(col)%powInt(16,2) == 0){
+                background(row)(col) = 0xFF0000FF
+              }
+            }
+          }
+          var outputFile : String = "superpose.png";
+          wrappedImage.saveImage(outputFile);
+        }
+
+    def calculVariance(src: Array[Array[Int]]) : Array[Array[Int]] = { //sur 8 directions avec 1pixels
+      var tabVariance = copy(src)
+
+      for (k <- 1 to src.length -2) {
+        for (l<- 1 to src(0).length -2) {
+
+          var moyenne = 0
+          var variance = 0
+            for (i <- k-1 to k+1) {
+              for (j<- l-1 to l+1) {
+                moyenne += src(i)(j)
+              }
+            }
+            moyenne = moyenne / 9
+
+            for (i <- k-1 to k+1) {
+              for (j<- l-1 to l+1) {
+                variance += 1/256 * powInt(src(i)(j) - moyenne, 2)
+              }
+            }
+            tabVariance(k)(l) = variance
+          }
+        }
+        return tabVariance
     }
 
 
@@ -97,11 +131,15 @@ object Main {
 println(image2D(0)(0));
 
 var clone=copy(image2D)
-var outputFile = "outputImagecopie.jpg";
-wrappedImage.saveImage(outputFile);
+var outputFile = "outputImagecopie.png";
 
 greyLevel(image2D);
+image2D = calculVariance(image2D)
+wrappedImage.saveImage(outputFile);
+println(image2D(3)(45))
 
+
+superImpoStreets(copy(image2D),imagetest);
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
 
 
