@@ -76,9 +76,38 @@ object Main {
       wrappedImage.saveImage(outputFile);
     }
 
-    def edgeDetection(src: Array[Array[Int]]) = {                               //To do
-      var tab = Array.ofDim[Int](src.length, src(0).length)
-
+    def edgeDetection(src: Array[Array[Int]]) = {
+      var Gx = copy(src)
+      var Gy = copy(src)
+      val matA = ((-1,0,1),(-1,0,1),(-1,0,1)) //Ceci n'est pas une matrice, or IL LE FAUT!!!
+      val matB = ((-1,-1,-1),(0,0,0),(1,1,1))
+      for (k<-0 to src.length-1) {
+        for (l<-0 to src(0).length-1) {
+          var somme = 0
+          var somme2 = 0
+          for (i<- 0 to 2 ) {
+            for (j <- 0 to 2) {
+              if (k-i < 0 || l-j < 0) {
+                somme += 0 * matA(i,j)
+                somme2 += 0* matB(i,j)
+              }
+              else {
+                somme += src(k-i)(l-j) * matA(i)(j)
+                somme2 += src(k-i)(l-j) * matB(i)(j)
+              }
+            }
+          }
+          Gx(k,l)=somme
+          Gy(k,l) = somme2
+        }
+      }
+      for (i<-0 to src.length-1) {
+        for (j<-0 to src(0).length-1) {
+          src(i)(j) = Gx(i)(j)
+        }
+      }
+      var outputFile : String = "convolution.png";
+      wrappedImage.saveImage(outputFile);
     }
 
     def traceStreets(src: Array[Array[Int]]) = {                                //To do
@@ -98,7 +127,7 @@ object Main {
           wrappedImage.saveImage(outputFile);
         }
 
-    def calculVariance(src: Array[Array[Int]]) : Array[Array[Int]] = { //sur 8 directions avec 1pixels
+    def calculVariance(src: Array[Array[Int]]) = { //sur 8 directions avec 1pixels DE LE MERDE!!!
       var tabVariance = copy(src)
 
       for (k <- 1 to src.length -2) {
@@ -121,7 +150,8 @@ object Main {
             tabVariance(k)(l) = variance
           }
         }
-        return tabVariance
+
+        wrappedImage.saveImage(outputFile);
     }
 
 
@@ -132,14 +162,9 @@ println(image2D(0)(0));
 
 var clone=copy(image2D)
 var outputFile = "outputImagecopie.png";
-
+edgeDetection(image2D)
 greyLevel(image2D);
-image2D = calculVariance(image2D)
-wrappedImage.saveImage(outputFile);
-println(image2D(3)(45))
-
-
-superImpoStreets(copy(image2D),imagetest);
+calculVariance(image2D)
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
 
 

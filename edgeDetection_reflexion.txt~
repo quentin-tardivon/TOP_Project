@@ -1,5 +1,8 @@
 Algorithme en pseudo code:
 
+-Prendre le premier pixel
+-regarder tous les pixels autour, vérifier qu'ils sont de même couleurs (ou de petits écarts)
+-continuer récursivement jusqu'a tomber dans une zone de saut important (ou arriver au bord de l'image)
 
 -regarder les propriétés géométrique de la zone selectionner
 -ranger les pixels examiné dans un tableau temporaire pour ne pas les reexaminer
