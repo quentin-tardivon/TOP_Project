@@ -10,12 +10,16 @@ object Main {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    var fileName : String = "sampleImage2.png";
+    var fileName : String = "image.jpg";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var image2D : Array[Array[Int]] = wrappedImage.getImage();
     var fileName2 : String = "testimpo.png"
     var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
     var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
+
+
+    var wrappedImageGrey : ImageWrapper = new ImageWrapper("greyImage.png");
+    var imageGrey : Array[Array[Int]] = wrappedImageGrey.getImage();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -72,15 +76,39 @@ object Main {
           src(row)(col) = 0xFF000000 + greyValue.toInt + greyValue.toInt*powInt(16,2) + greyValue.toInt * powInt(16,4)
         }
       }
-      var outputFile : String = "outputImage2.png";
+      var outputFile : String = "greyImage.png";
       wrappedImage.saveImage(outputFile);
     }
 
-    def edgeDetection(src: Array[Array[Int]]) = {
-      var Gx = copy(src)
-      var Gy = copy(src)
-      val matA = ((-1,0,1),(-1,0,1),(-1,0,1)) //Ceci n'est pas une matrice, or IL LE FAUT!!!
-      val matB = ((-1,-1,-1),(0,0,0),(1,1,1))
+    def edgeDetection1(src: Array[Array[Int]]) = {
+      var gX = copy(src)
+      var gY = copy(src)
+      var matA = Array.ofDim[Int](3, 3)
+      var matB = Array.ofDim[Int](3, 3)
+      for (i<-0 to 2) {  //remplissage simple de la matrice
+        for (j<-0 to 2) {
+          if (j==0) {
+            matA(i)(j) = -1
+          }
+          else if (j==1) {
+            matA(i)(j) = 0
+          }
+          else {
+            matA(i)(j) = 1
+          }
+          if (i==0) {
+            matB(i)(j) = -1
+          }
+          else if (i==1) {
+            matB(i)(j) = 0
+          }
+          else {
+            matB(i)(j) = 1
+          }
+
+        }
+      }
+
       for (k<-0 to src.length-1) {
         for (l<-0 to src(0).length-1) {
           var somme = 0
@@ -88,8 +116,8 @@ object Main {
           for (i<- 0 to 2 ) {
             for (j <- 0 to 2) {
               if (k-i < 0 || l-j < 0) {
-                somme += 0 * matA(i,j)
-                somme2 += 0* matB(i,j)
+                somme += 0 * matA(i)(j)
+                somme2 += 0* matB(i)(j)
               }
               else {
                 somme += src(k-i)(l-j) * matA(i)(j)
@@ -97,18 +125,62 @@ object Main {
               }
             }
           }
-          Gx(k,l)=somme
-          Gy(k,l) = somme2
+          gX(k)(l)=somme
+          gY(k)(l) = somme2
         }
       }
+      var gFinal = sqrtMatrice(addMatrice(prodMatrice(gX,gX),prodMatrice(gY,gY)))
       for (i<-0 to src.length-1) {
         for (j<-0 to src(0).length-1) {
-          src(i)(j) = Gx(i)(j)
+          src(i)(j) = gFinal(i)(j)
         }
       }
-      var outputFile : String = "convolution.png";
-      wrappedImage.saveImage(outputFile);
+      var sortie : String = "convolution.png";
+      wrappedImageGrey.saveImage(sortie);
     }
+
+    def edgeDetection2(src: Array[Array[Int]]) = {
+      var gX = copy(src)
+      var gY = copy(src)
+      var matA = Array.ofDim[Int](3, 3)
+      var matB = Array.ofDim[Int](3, 3)
+      for (i<-0 to 2) {  //remplissage simple de la matrice
+        for (j<-0 to 2) {
+          if (j==0) {
+            matA(i)(j) = -1
+          }
+          else if (j==1) {
+            matA(i)(j) = 0
+          }
+          else {
+            matA(i)(j) = 1
+          }
+          if (i==0) {
+            matB(i)(j) = -1
+          }
+          else if (i==1) {
+            matB(i)(j) = 0
+          }
+          else {
+            matB(i)(j) = 1
+          }
+
+        }
+      }
+
+
+      var gFinal = conv2D(src,matA)
+      for (i<-0 to src.length-1) {
+        for (j<-0 to src(0).length-1) {
+          src(i)(j) = gFinal(i)(j)
+        }
+      }
+      var sortie : String = "convolution.png";
+      wrappedImageGrey.saveImage(sortie);
+    }
+
+
+
 
     def traceStreets(src: Array[Array[Int]]) = {                                //To do
 
@@ -150,21 +222,86 @@ object Main {
             tabVariance(k)(l) = variance
           }
         }
-
-        wrappedImage.saveImage(outputFile);
     }
 
+    def prodMatrice(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat2(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat2(0).length-1) {
+          var somme = 0
+          for (k<- 0 to mat2.length-1) {
+            somme += mat1(i)(k) * mat2(k)(j)
+          }
+          resultat(i)(j) = somme
+        }
+      }
+      return resultat
+    }
+
+    def addMatrice(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat2(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat2(0).length-1) {
+            resultat(i)(j) = mat1(i)(j) + mat2(i)(j)
+        }
+      }
+      return resultat
+    }
+
+    def sqrtMatrice(mat1 : Array[Array[Int]]) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat1(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat1(0).length-1) {
+            resultat(i)(j) = math.sqrt(mat1(i)(j)).toInt
+        }
+      }
+      return resultat
+    }
+
+
+    def conv2D(x: Array[Array[Int]],h: Array[Array[Int]]) : Array[Array[Int]] = { //Ca marche pas, c'est triste
+      var kCenterX = h.length / 2;
+      var kCenterY = h(0).length / 2;
+      var out = Array.ofDim[Int](x.length, x(0).length)
+
+      for(i<-0 to x.length-1)              // rows
+      {
+          for(j<-0 to x(0).length-1)          // columns
+          {
+              for(m<-0 to h.length-1)     // kernel rows
+              {
+                  var mm = h.length - 2 - m;      // row index of flipped kernel
+
+                  for(n<-0 to h(0).length) // kernel columns
+                  {
+                      var nn = h(0).length - 2 - n;  // column index of flipped kernel
+
+                      // index of input signal, used for checking boundary
+                      var ii = i + (m - kCenterY) -1;
+                      var jj = j + (n - kCenterX) -1;
+
+                      // ignore input samples which are out of bound
+                      if( ii >= 0 && ii < x.length-1 && jj >= 0 && jj < x(0).length-1 ) {
+                          out(i)(j) += x(ii)(jj) * h(mm)(nn);
+                      }
+                  }
+              }
+          }
+      }
+      return out
+    }
 
 ///////////////////////////////////Zone de Test/////////////////////////////////
 
 
-println(image2D(0)(0));
 
-var clone=copy(image2D)
-var outputFile = "outputImagecopie.png";
-edgeDetection(image2D)
 greyLevel(image2D);
-calculVariance(image2D)
+
+
+
+edgeDetection2(imageGrey)
+
+
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
 
 
