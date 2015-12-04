@@ -10,7 +10,7 @@ object Main {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    var fileName : String = "image.jpg";
+    var fileName : String = "sampleImage2.png";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var image2D : Array[Array[Int]] = wrappedImage.getImage();
     var fileName2 : String = "testimpo.png"
@@ -21,12 +21,79 @@ object Main {
     var wrappedImageGrey : ImageWrapper = new ImageWrapper("greyImage.png");
     var imageGrey : Array[Array[Int]] = wrappedImageGrey.getImage();
 
+    var matA = Array.ofDim[Int](3, 3)
+    var matB = Array.ofDim[Int](3, 3)
+    matA(0)(0) = -1
+    matA(0)(1) = 0
+    matA(0)(2) = 1
+    matA(1)(0) = -2
+    matA(1)(1) = 0
+    matA(1)(2) = 2
+    matA(2)(0) = -1
+    matA(2)(1) = 0
+    matA(2)(2) = 1
+
+    matB(0)(0) = -1
+    matB(0)(1) = -2
+    matB(0)(2) = -1
+    matB(1)(0) = 0
+    matB(1)(1) = 0
+    matB(1)(2) = 0
+    matB(2)(0) = 1
+    matB(2)(1) = 2
+    matB(2)(2) = 1
+
 ////////////////////////////////////////////////////////////////////////////////
 
     def powInt(num: Int, n: Int): Int = n match {
       case 0 => return 1
       case _ => num * powInt(num, n-1)
     }
+
+    def addMatrice(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat2(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat2(0).length-1) {
+            resultat(i)(j) = mat1(i)(j) + mat2(i)(j)
+        }
+      }
+      return resultat
+    }
+
+    def sqrtMatrice(mat1 : Array[Array[Int]]) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat1(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat1(0).length-1) {
+            resultat(i)(j) = math.sqrt(mat1(i)(j)).toInt
+        }
+      }
+      return resultat
+    }
+
+    def prod_elparel(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat1(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat1(0).length-1) {
+            resultat(i)(j) = powInt(mat1(i)(j),2)
+        }
+      }
+      return resultat
+    }
+
+    def prodMatrice(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
+      var resultat =  Array.ofDim[Int](mat1.length, mat2(0).length)
+      for (i<-0 to mat1.length-1) {
+        for (j<-0 to mat2(0).length-1) {
+          var somme = 0
+          for (k<- 0 to mat2.length-1) {
+            somme += mat1(i)(k) * mat2(k)(j)
+          }
+          resultat(i)(j) = somme
+        }
+      }
+      return resultat
+    }
+
 
     def test_API() = {                                                          //Just a test
 
@@ -80,34 +147,9 @@ object Main {
       wrappedImage.saveImage(outputFile);
     }
 
-    def edgeDetection1(src: Array[Array[Int]]) = {
+    def edgeDetection1(src: Array[Array[Int]],matA: Array[Array[Int]],matB: Array[Array[Int]]) = {
       var gX = copy(src)
       var gY = copy(src)
-      var matA = Array.ofDim[Int](3, 3)
-      var matB = Array.ofDim[Int](3, 3)
-      for (i<-0 to 2) {  //remplissage simple de la matrice
-        for (j<-0 to 2) {
-          if (j==0) {
-            matA(i)(j) = -1
-          }
-          else if (j==1) {
-            matA(i)(j) = 0
-          }
-          else {
-            matA(i)(j) = 1
-          }
-          if (i==0) {
-            matB(i)(j) = -1
-          }
-          else if (i==1) {
-            matB(i)(j) = 0
-          }
-          else {
-            matB(i)(j) = 1
-          }
-
-        }
-      }
 
       for (k<-0 to src.length-1) {
         for (l<-0 to src(0).length-1) {
@@ -120,16 +162,16 @@ object Main {
                 somme2 += 0* matB(i)(j)
               }
               else {
-                somme += src(k-i)(l-j) * matA(i)(j)
-                somme2 += src(k-i)(l-j) * matB(i)(j)
+                somme += src(k-i)(l-j) % powInt(16,2) * matA(i)(j)
+                somme2 += src(k-i)(l-j) % powInt(16,2) * matB(i)(j)
               }
             }
           }
-          gX(k)(l)=somme
-          gY(k)(l) = somme2
+          gX(k)(l) = 0xFF000000 + somme + somme*powInt(16,2) + somme * powInt(16,4)
+          gY(k)(l) = 0xFF000000 + somme2 + somme2*powInt(16,2) + somme2 * powInt(16,4)
         }
       }
-      var gFinal = sqrtMatrice(addMatrice(prodMatrice(gX,gX),prodMatrice(gY,gY)))
+      var gFinal = sqrtMatrice(addMatrice(prod_elparel(gX,gX),prod_elparel(gY,gY)))
       for (i<-0 to src.length-1) {
         for (j<-0 to src(0).length-1) {
           src(i)(j) = gFinal(i)(j)
@@ -179,9 +221,6 @@ object Main {
       wrappedImageGrey.saveImage(sortie);
     }
 
-
-
-
     def traceStreets(src: Array[Array[Int]]) = {                                //To do
 
     }
@@ -198,65 +237,6 @@ object Main {
           var outputFile : String = "superpose.png";
           wrappedImage.saveImage(outputFile);
         }
-
-    def calculVariance(src: Array[Array[Int]]) = { //sur 8 directions avec 1pixels DE LE MERDE!!!
-      var tabVariance = copy(src)
-
-      for (k <- 1 to src.length -2) {
-        for (l<- 1 to src(0).length -2) {
-
-          var moyenne = 0
-          var variance = 0
-            for (i <- k-1 to k+1) {
-              for (j<- l-1 to l+1) {
-                moyenne += src(i)(j)
-              }
-            }
-            moyenne = moyenne / 9
-
-            for (i <- k-1 to k+1) {
-              for (j<- l-1 to l+1) {
-                variance += 1/256 * powInt(src(i)(j) - moyenne, 2)
-              }
-            }
-            tabVariance(k)(l) = variance
-          }
-        }
-    }
-
-    def prodMatrice(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
-      var resultat =  Array.ofDim[Int](mat1.length, mat2(0).length)
-      for (i<-0 to mat1.length-1) {
-        for (j<-0 to mat2(0).length-1) {
-          var somme = 0
-          for (k<- 0 to mat2.length-1) {
-            somme += mat1(i)(k) * mat2(k)(j)
-          }
-          resultat(i)(j) = somme
-        }
-      }
-      return resultat
-    }
-
-    def addMatrice(mat1 : Array[Array[Int]],mat2 : Array[Array[Int]] ) : Array[Array[Int]] = {
-      var resultat =  Array.ofDim[Int](mat1.length, mat2(0).length)
-      for (i<-0 to mat1.length-1) {
-        for (j<-0 to mat2(0).length-1) {
-            resultat(i)(j) = mat1(i)(j) + mat2(i)(j)
-        }
-      }
-      return resultat
-    }
-
-    def sqrtMatrice(mat1 : Array[Array[Int]]) : Array[Array[Int]] = {
-      var resultat =  Array.ofDim[Int](mat1.length, mat1(0).length)
-      for (i<-0 to mat1.length-1) {
-        for (j<-0 to mat1(0).length-1) {
-            resultat(i)(j) = math.sqrt(mat1(i)(j)).toInt
-        }
-      }
-      return resultat
-    }
 
 
     def conv2D(x: Array[Array[Int]],h: Array[Array[Int]]) : Array[Array[Int]] = { //Ca marche pas, c'est triste
@@ -291,6 +271,34 @@ object Main {
       return out
     }
 
+
+
+    def calculVariance(src: Array[Array[Int]]) = { //sur 8 directions avec 1pixels DE LE MERDE!!!
+      var tabVariance = copy(src)
+
+      for (k <- 1 to src.length -2) {
+        for (l<- 1 to src(0).length -2) {
+
+          var moyenne = 0
+          var variance = 0
+            for (i <- k-1 to k+1) {
+              for (j<- l-1 to l+1) {
+                moyenne += src(i)(j)
+              }
+            }
+            moyenne = moyenne / 9
+
+            for (i <- k-1 to k+1) {
+              for (j<- l-1 to l+1) {
+                variance += 1/256 * powInt(src(i)(j) - moyenne, 2)
+              }
+            }
+            tabVariance(k)(l) = variance
+          }
+        }
+    }
+
+
 ///////////////////////////////////Zone de Test/////////////////////////////////
 
 
@@ -299,7 +307,7 @@ greyLevel(image2D);
 
 
 
-edgeDetection2(imageGrey)
+edgeDetection1(imageGrey,matA,matB)
 
 
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
