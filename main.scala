@@ -147,7 +147,7 @@ object Main {
       wrappedImage.saveImage(outputFile);
     }
 
-    def edgeDetection1(src: Array[Array[Int]],matA: Array[Array[Int]],matB: Array[Array[Int]]) = {
+    def edgeDetection(src: Array[Array[Int]],matA: Array[Array[Int]],matB: Array[Array[Int]]) = {
       var gX = copy(src)
       var gY = copy(src)
 
@@ -167,53 +167,17 @@ object Main {
               }
             }
           }
-          gX(k)(l) = 0xFF000000 + somme + somme*powInt(16,2) + somme * powInt(16,4)
-          gY(k)(l) = 0xFF000000 + somme2 + somme2*powInt(16,2) + somme2 * powInt(16,4)
+          var sommeD = (somme.toDouble) * (255.0/1020.0)  //somme+1020.0 * 255.0/2040.0
+          var somme2D = (somme2.toDouble) * (255.0/1020.0)
+          gX(k)(l) = sommeD.toInt
+          gY(k)(l) = somme2D.toInt
         }
       }
       var gFinal = sqrtMatrice(addMatrice(prod_elparel(gX,gX),prod_elparel(gY,gY)))
       for (i<-0 to src.length-1) {
         for (j<-0 to src(0).length-1) {
-          src(i)(j) = gFinal(i)(j)
-        }
-      }
-      var sortie : String = "convolution.png";
-      wrappedImageGrey.saveImage(sortie);
-    }
-
-    def edgeDetection2(src: Array[Array[Int]]) = {
-      var gX = copy(src)
-      var gY = copy(src)
-      var matA = Array.ofDim[Int](3, 3)
-      var matB = Array.ofDim[Int](3, 3)
-      for (i<-0 to 2) {  //remplissage simple de la matrice
-        for (j<-0 to 2) {
-          if (j==0) {
-            matA(i)(j) = -1
-          }
-          else if (j==1) {
-            matA(i)(j) = 0
-          }
-          else {
-            matA(i)(j) = 1
-          }
-          if (i==0) {
-            matB(i)(j) = -1
-          }
-          else if (i==1) {
-            matB(i)(j) = 0
-          }
-          else {
-            matB(i)(j) = 1
-          }
-
-        }
-      }
-
-
-      var gFinal = conv2D(src,matA)
-      for (i<-0 to src.length-1) {
-        for (j<-0 to src(0).length-1) {
+          gFinal(i)(j) = (gFinal(i)(j) * (255.0/360.0)).toInt
+          gFinal(i)(j) = 0xFF000000 + gFinal(i)(j).toInt + gFinal(i)(j).toInt*powInt(16,2) + gFinal(i)(j).toInt * powInt(16,4)
           src(i)(j) = gFinal(i)(j)
         }
       }
@@ -283,14 +247,14 @@ object Main {
           var variance = 0
             for (i <- k-1 to k+1) {
               for (j<- l-1 to l+1) {
-                moyenne += src(i)(j)
+                moyenne += src(i)(j)% powInt(16,2)
               }
             }
             moyenne = moyenne / 9
 
             for (i <- k-1 to k+1) {
               for (j<- l-1 to l+1) {
-                variance += 1/256 * powInt(src(i)(j) - moyenne, 2)
+                variance += 1/256 * powInt(src(i)(j)% powInt(16,2) - moyenne, 2)
               }
             }
             tabVariance(k)(l) = variance
@@ -307,7 +271,7 @@ greyLevel(image2D);
 
 
 
-edgeDetection1(imageGrey,matA,matB)
+edgeDetection(imageGrey,matA,matB)
 
 
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
