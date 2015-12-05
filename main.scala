@@ -14,7 +14,7 @@ object Main {
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var image2D : Array[Array[Int]] = wrappedImage.getImage();
 
-    var fileName2 = "testimpo.png";
+    var fileName2 : String = "testimpo.png";
     var wrappedImage2 = new ImageWrapper(fileName2);
     var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
 
@@ -64,7 +64,7 @@ object Main {
               }
             }
           }
-          var outputFile : String = "superpose.jpg";
+          var outputFile : String = "superpose.png";
           wrappedImage.saveImage(outputFile);
         }
 
@@ -100,9 +100,7 @@ object Main {
 
     }
 
-    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) {
 
-    }
 
 
 ///////////////////////////////////Zone de Test/////////////////////////////////
