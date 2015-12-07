@@ -90,6 +90,28 @@ object Main {
       return resultat
     }
 
+    def tracerSegment(x1 : Int, y1 : Int, x2: Int, y2: Int) : List[Array[Int]]= { //Selon l'algorithme de Bresenham
+      var cord = Array.ofDim[Int](2)
+      var resultat : List[Array[Int]]= List()
+      var y = y1
+      var dy = y2 -y1
+      var dx = x2 -x1
+      var e = 0.0
+      var e10 = dy / dx
+      var e01 = -1.0
+
+      for(x<-x1 to x2) {
+        cord(0) = x
+        cord(1) = y
+        resultat = cord :: resultat
+        e = e+ e10
+        if (e >= 0.5) {
+          y += 1
+          e = e + e01
+        }
+      }
+      return resultat
+    }
 
     def test_API() = {                                                          //Just a test
 
@@ -183,12 +205,12 @@ object Main {
       wrappedImage.saveImage(sortie);
     }
 
-    def traceStreets(src: Array[Array[Int]]) : Array[Array[Int]] = {                                //To do
+    def traceStreets(src: Array[Array[Int]])  = {                                //To do
 
     }
 
     def rechercheRoute(pixPrec : Array[Int]) = {
-      
+
     }
 
     def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
@@ -259,7 +281,10 @@ object Main {
 ///////////////////////////////////Zone de Test/////////////////////////////////
 
 
-edgeDetection(toAnalyze,matA,matB)
+var listeqcq= tracerSegment(0,0,3,3)
+
+println(listeqcq.tail.tail.head(0))
+//edgeDetection(toAnalyze,matA,matB)
 
 
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!
