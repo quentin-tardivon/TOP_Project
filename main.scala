@@ -10,16 +10,12 @@ object Main {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    var fileName : String = "sampleImage2.png";
+    var fileName : String = "toAnalyze.jpg";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
-    var image2D : Array[Array[Int]] = wrappedImage.getImage();
+    var toAnalyze : Array[Array[Int]] = wrappedImage.getImage();
     var fileName2 : String = "testimpo.png"
     var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
     var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
-
-
-    var wrappedImageGrey : ImageWrapper = new ImageWrapper("greyImage.png");
-    var imageGrey : Array[Array[Int]] = wrappedImageGrey.getImage();
 
     var matA = Array.ofDim[Int](3, 3)
     var matB = Array.ofDim[Int](3, 3)
@@ -124,7 +120,7 @@ object Main {
       return tab
     }
 
-    def greyLevel (src: Array[Array[Int]]) = {                                   //Done
+    def greyLevel (src: Array[Array[Int]]) : Array[Array[Int]] = {                                   //Done
       var pixValue = 0
       var blueValue = 0
       var greenValue = 0
@@ -145,14 +141,16 @@ object Main {
       }
       var outputFile : String = "greyImage.png";
       wrappedImage.saveImage(outputFile);
+      return src
     }
 
     def edgeDetection(src: Array[Array[Int]],matA: Array[Array[Int]],matB: Array[Array[Int]]) = {
-      var gX = copy(src)
-      var gY = copy(src)
+      var greyTab = greyLevel(src)
+      var gX = copy(greyTab)
+      var gY = copy(greyTab)
 
-      for (k<-0 to src.length-1) {
-        for (l<-0 to src(0).length-1) {
+      for (k<-0 to greyTab.length-1) {
+        for (l<-0 to greyTab(0).length-1) {
           var somme = 0
           var somme2 = 0
           for (i<- 0 to 2 ) {
@@ -162,8 +160,8 @@ object Main {
                 somme2 += 0* matB(i)(j)
               }
               else {
-                somme += src(k-i)(l-j) % powInt(16,2) * matA(i)(j)
-                somme2 += src(k-i)(l-j) % powInt(16,2) * matB(i)(j)
+                somme += greyTab(k-i)(l-j) % powInt(16,2) * matA(i)(j)
+                somme2 += greyTab(k-i)(l-j) % powInt(16,2) * matB(i)(j)
               }
             }
           }
@@ -181,12 +179,16 @@ object Main {
           src(i)(j) = gFinal(i)(j)
         }
       }
-      var sortie : String = "convolution.png";
-      wrappedImageGrey.saveImage(sortie);
+      var sortie : String = "contour.png";
+      wrappedImage.saveImage(sortie);
     }
 
-    def traceStreets(src: Array[Array[Int]]) = {                                //To do
+    def traceStreets(src: Array[Array[Int]]) : Array[Array[Int]] = {                                //To do
 
+    }
+
+    def rechercheRoute(pixPrec : Array[Int]) = {
+      
     }
 
     def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
@@ -237,41 +239,27 @@ object Main {
 
 
 
-    def calculVariance(src: Array[Array[Int]]) = { //sur 8 directions avec 1pixels DE LE MERDE!!!
-      var tabVariance = copy(src)
+    def calculVariance(src: Array[Array[Int]],pixTrav : Array[Int]) : Double = {
+      var variance = 0.0
+      var moyenne = 0.0
+      for (i<-0 to pixTrav.length-1) {
+        moyenne += pixTrav(i)
+      }
+      moyenne = moyenne / pixTrav.length
 
-      for (k <- 1 to src.length -2) {
-        for (l<- 1 to src(0).length -2) {
+      for (i<-0 to pixTrav.length-1) {
+        variance += (pixTrav(i) - moyenne) * (pixTrav(i) - moyenne)
+      }
+      variance = variance / pixTrav.length
 
-          var moyenne = 0
-          var variance = 0
-            for (i <- k-1 to k+1) {
-              for (j<- l-1 to l+1) {
-                moyenne += src(i)(j)% powInt(16,2)
-              }
-            }
-            moyenne = moyenne / 9
-
-            for (i <- k-1 to k+1) {
-              for (j<- l-1 to l+1) {
-                variance += 1/256 * powInt(src(i)(j)% powInt(16,2) - moyenne, 2)
-              }
-            }
-            tabVariance(k)(l) = variance
-          }
-        }
+      return variance
     }
 
 
 ///////////////////////////////////Zone de Test/////////////////////////////////
 
 
-
-greyLevel(image2D);
-
-
-
-edgeDetection(imageGrey,matA,matB)
+edgeDetection(toAnalyze,matA,matB)
 
 
 //Il n'est en fait pas possible d'imprimer un l'image copier, il faut effectuer des sauvegardes aux moments clefs!

@@ -1,9 +1,0 @@
-Algorithme en pseudo code:
-
-
--regarder les propriétés géométrique de la zone selectionner
--ranger les pixels examiné dans un tableau temporaire pour ne pas les reexaminer
-
-On peut imaginer totalement autre chose:
-
--Chercher une ligne, il faudrait connaître la taille moyenne d'une route en pixel?
