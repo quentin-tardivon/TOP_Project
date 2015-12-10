@@ -7,6 +7,7 @@ exec scala -classpath "./source/API/imagewrapper_2.11-1.0.0.jar" "$0" "$@"
 object Main {
   def main(args: Array[String]) : Unit = {
     import com.tncy.top.image.ImageWrapper;
+    import scala.util.control.Breaks._;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -90,27 +91,112 @@ object Main {
       return resultat
     }
 
+    def calculOctant(dx : Double, dy : Double) : Int = {
+
+      if (dy >=0) {
+        if(dx >= 0) {
+          if(dx>=dy) {
+            return 0
+          }
+          else {
+            return 1
+          }
+        }
+        else {
+          if(dy >= -dx) {
+            return 2
+          }
+          else {
+            return 3
+          }
+        }
+      }
+      else {
+        if(dx <= 0) {
+          if(dx <= dy) {
+            return 4
+          }
+          else {
+            return 5
+          }
+        }
+        else {
+          if(-dy >= dx) {
+            return 6
+          }
+          else {
+            return 7
+          }
+        }
+      }
+    }
+
+    def tracerSegmentInput(x1:Int,y1:Int,x2:Int,y2:Int) = calculOctant(x2-x1,y2-y1) match {
+      case 0 => tracerSegment(x1,y1,x2,y2)
+      case 1 => tracerSegment(x1,y1,y2,x2)
+      case 2 => tracerSegment(x1,y1,y2,-x2)
+      case 3 => tracerSegment(x1,y1,-x2,y2)
+      case 4 => tracerSegment(x1,y1,-x2,-y2)
+      case 5 => tracerSegment(x1,y1,-y2,-x2)
+      case 6 => tracerSegment(x1,y1,-y2,x2)
+      case 7 => tracerSegment(x1,y1,x2,-y2)
+    }
+
     def tracerSegment(x1 : Int, y1 : Int, x2: Int, y2: Int) : List[Array[Int]]= { //Selon l'algorithme de Bresenham
-      var cord = Array.ofDim[Int](2)
       var resultat : List[Array[Int]]= List()
       var y = y1
-      var dy = y2 -y1
-      var dx = x2 -x1
+      var dy :Double= y2 -y1
+      var dx :Double= x2 -x1
+
       var e = 0.0
-      var e10 = dy / dx
+      var e10 : Double = dy / dx
       var e01 = -1.0
 
       for(x<-x1 to x2) {
+        var cord = Array.ofDim[Int](2)
         cord(0) = x
         cord(1) = y
         resultat = cord :: resultat
+        //println(resultat.head(0),resultat.head(1))
         e = e+ e10
         if (e >= 0.5) {
           y += 1
           e = e + e01
         }
       }
-      return resultat
+      return tracerSegmentOutput(x1,y2,y1,y2,resultat)
+    }
+
+    def tracerSegmentOutput(x1:Int,y1:Int,x2:Int,y2:Int,liste:List[Array[Int]]) = calculOctant(x2-x1,y2-y1) match {
+      case 0 => reverse(liste,false,false,false)
+      case 1 => reverse(liste,true,false,false)
+      case 2 => reverse(liste,true,false,true)
+      case 3 => reverse(liste,false,true,false)
+      case 4 => reverse(liste,false,true,true)
+      case 5 => reverse(liste,true,true,true)
+      case 6 => reverse(liste,true,true,false)
+      case 7 => reverse(liste,false,false,true)
+    }
+
+
+    def reverse(l : List[Array[Int]],swap:Boolean,signeX:Boolean,signeY:Boolean) : List[Array[Int]] = {
+      l match {
+      case List() => List()
+      case h::t =>
+      if(signeX) {
+        h(0) = -h(0)
+      }
+      if(signeY) {
+        h(1) = -h(1)
+      }
+      if(swap) {
+        var c = h(0)
+        h(0) = h(1)
+        h(1) = c
+      }
+
+      return reverse(t,swap,signeX,signeY):::List(h)
+      }
     }
 
     def test_API() = {                                                          //Just a test
@@ -281,9 +367,12 @@ object Main {
 ///////////////////////////////////Zone de Test/////////////////////////////////
 
 
-var listeqcq= tracerSegment(0,0,3,3)
+var listeqcq= tracerSegmentInput(-1,0,13,24)
 
-println(listeqcq.tail.tail.head(0))
+for (i<-0 to listeqcq.length-1) {
+  println(listeqcq.head(0),listeqcq.head(1))
+  listeqcq = listeqcq.tail
+}
 //edgeDetection(toAnalyze,matA,matB)
 
 
