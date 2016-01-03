@@ -173,6 +173,29 @@ object Main {
       return resultat
     }
 
+    def sort(tab_chemin: Array[List[Array[Int]]],tab_cout:Array[Double]) {
+      def swap(i: Int, j: Int) {
+        val t = tab_cout(i); tab_cout(i) = tab_cout(j); tab_cout(j) = t
+        val k = tab_chemin(i); tab_chemin(i) = tab_chemin(j); tab_chemin(j) = k
+      }
+      def sort1(l: Int, r: Int) {
+        val pivot = tab_cout((l + r) / 2)
+        var i = l; var j = r
+        while (i <= j) {
+         while (tab_cout(i) < pivot) i += 1
+         while (tab_cout(j) > pivot) j -= 1
+        if (i <= j) {
+          swap(i, j)
+          i += 1
+          j -= 1
+        }
+        }
+         if (l < j) sort1(l, j)
+         if (j < r) sort1(i, r)
+         }
+       sort1(0, tab_cout.length - 1)
+     }
+
     def calculOctant(dx : Double, dy : Double) : Int = {
 
       if (dy >=0) {
@@ -281,13 +304,13 @@ object Main {
       }
     }
 
-    def calcul_cout(src:Array[Array[Int]],l:List[Array[Int]]) = {
+    def calcul_cout(src:Array[Array[Int]],l:List[Array[Int]]) : Double= {
       var liste = l
       var cout = 0.0
 
         cout = cout + (calculVariance(src,liste) / liste.length)
 
-
+        return cout
     }
 
     def test_API() = {                                                          //Just a test
@@ -382,7 +405,36 @@ object Main {
       wrappedImage.saveImage(sortie);
     }
 
-    def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Array[Array[Int]] = {                                //To do
+    def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],profi:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {
+      var tab_chemin : Array[List[Array[Int]]] = Array()
+      var tab_cout : Array[Double] = Array()
+      traceStreets(src,matPassage,0,5,0,1,x,y,List())
+      sort(tab_chemin,tab_cout)
+
+      if (profi == 6) {
+
+
+      }
+
+      else {
+        var copie_chemin = tab_chemin.clone
+
+        for (i<-0 to tab_chemin(0).length-1) {
+          matPassage(copie_chemin(0).head(0))(copie_chemin(0).head(1)) = 0
+          matPassage(copie_chemin(1).head(0))(copie_chemin(1).head(1)) = 0
+          matPassage(copie_chemin(2).head(0))(copie_chemin(2).head(1)) = 0
+          copie_chemin(0) = copie_chemin(0).tail
+          copie_chemin(1) = copie_chemin(1).tail
+          copie_chemin(2) = copie_chemin(2).tail
+
+        }
+
+        trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(0).head(0),tab_chemin(0).head(1),List())
+        trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(1).head(0),tab_chemin(1).head(1),List())
+        trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(2).head(0),tab_chemin(2).head(1),List())
+      }
+
+    def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {                                //To do
       var north = tracerLigne(x,y,"N",10):::chemin
       var north_east = tracerLigne(x,y,"NE",10):::chemin
       var north_west = tracerLigne(x,y,"NW",10):::chemin
@@ -395,19 +447,10 @@ object Main {
         var cout_north_west = calcul_cout(src,north_west)
         var cout_west = calcul_cout(src,west)
 
-        for (i<-0 to north.length-1) {
-          matPassage(north.head(0))(north.head(1)) = 0
-          matPassage(east.head(0))(east.head(1)) = 0
-          matPassage(west.head(0))(west.head(1)) = 0
-          matPassage(north_east.head(0))(north_east.head(1)) = 0
-          matPassage(north_west.head(0))(north_west.head(1)) = 0
-          north = north.tail
-          east= east.tail
-          west = west.tail
-          north_east = north_east.tail
-          north_west = north_west.tail
-        }
-        return matPassage
+        tab_cout =tab_cout ++ Array(cout_north) ++ Array(cout_east) ++ Array(cout_west) ++ Array(cout_north_west) ++ Array(cout_north_east)
+        tab_chemin = tab_chemin ++ Array(north) ++ Array(east) ++ Array(west) ++ Array(north_west) ++ Array(north_east)
+
+        sort(tab_chemin,tab_cout)
       }
       else {
         traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north)
@@ -418,10 +461,7 @@ object Main {
       }
 
     }
-
-    def rechercheRoute(pixPrec : Array[Int]) = {
-
-    }
+}
 
     def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
 
@@ -498,7 +538,7 @@ var fileName3 : String = "whiteImg.png"
 var wrappedImage3 : ImageWrapper = new ImageWrapper(fileName3)
 var matPassage : Array[Array[Int]] = wrappedImage3.getImage();
 
-traceStreets(imagetest,matPassage,0,5,1,1,623,278,List())
+trouve_chemin(imagetest,matPassage,0,5,1,1,623,278,List())
 wrappedImage3.saveImage("imageTrace.png")
 
 
