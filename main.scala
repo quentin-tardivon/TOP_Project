@@ -91,6 +91,88 @@ object Main {
       return resultat
     }
 
+    def tracerLigne (x:Int,y:Int,dir:String,long:Int) : List[Array[Int]]= dir match {
+      case "E" => var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x
+          cord(1) = y+i
+          resultat = cord::resultat
+        }
+
+      return resultat
+
+      case "S" => var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x+i
+          cord(1) = y
+          resultat= cord::resultat
+        }
+
+      return resultat
+
+      case "W" => var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x
+          cord(1) = y-i
+          resultat = cord::resultat
+        }
+
+      return resultat
+
+      case "N" =>   var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x-i
+          cord(1) = y
+          resultat = cord::resultat
+        }
+
+      return resultat
+
+      case "NW" =>var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x-i
+          cord(1) = y-i
+          resultat = cord::resultat
+        }
+
+      return resultat
+
+      case "NE" => var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x-i
+          cord(1) = y+i
+          resultat = cord::resultat
+        }
+
+      return resultat
+
+      case "SW" => var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x-i
+          cord(1) = y+i
+          resultat = cord::resultat
+        }
+
+      return resultat
+
+      case "SE" => var resultat : List[Array[Int]]= List()
+        for (i<- 0 to long-1) {
+          var cord = Array.ofDim[Int](2)
+          cord(0) = x+i
+          cord(1) = y+i
+          resultat = cord::resultat
+        }
+
+      return resultat
+    }
+
     def calculOctant(dx : Double, dy : Double) : Int = {
 
       if (dy >=0) {
@@ -168,7 +250,7 @@ object Main {
     }
 
     def tracerSegmentOutput(x1:Int,y1:Int,x2:Int,y2:Int,liste:List[Array[Int]]) = calculOctant(x2-x1,y2-y1) match {
-      case 0 => reverse(liste,false,false,false)
+      case _ => reverse(liste,false,false,false)
       case 1 => reverse(liste,true,false,false)
       case 2 => reverse(liste,true,false,true)
       case 3 => reverse(liste,false,true,false)
@@ -196,6 +278,15 @@ object Main {
       }
 
       return reverse(t,swap,signeX,signeY):::List(h)
+      }
+    }
+
+    def calcul_cout(src:Array[Array[Int]],l:List[List[Array[Int]]]) = {
+      var liste = l
+      var cout = 0.0
+      for (i<-1 to 4) {
+        cout = cout + (calculVariance(src,liste.head) / liste.head.length)
+        liste=l.tail
       }
     }
 
@@ -291,7 +382,15 @@ object Main {
       wrappedImage.saveImage(sortie);
     }
 
-    def traceStreets(src: Array[Array[Int]])  = {                                //To do
+    def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,DirI:Int,rigid:Int,x:Int,y:Int)  = {                                //To do
+      var north = tracerLigne(x,y,"N",10)
+      var north_east = tracerLigne(x,y,"NE",10)
+      var north_west = tracerLigne(x,y,"NW",10)
+      var east = tracerLigne(x,y,"E",10)
+      var west = tracerLigne(x,y,"W",10)
+
+
+
 
     }
 
@@ -347,16 +446,19 @@ object Main {
 
 
 
-    def calculVariance(src: Array[Array[Int]],pixTrav : Array[Int]) : Double = {
+    def calculVariance(src: Array[Array[Int]],pixTrav : List[Array[Int]]) : Double = {
       var variance = 0.0
       var moyenne = 0.0
+      var liste = pixTrav
       for (i<-0 to pixTrav.length-1) {
-        moyenne += pixTrav(i)
+        moyenne += src(liste.head(0))(liste.head(1))
+        liste= liste.tail
       }
       moyenne = moyenne / pixTrav.length
-
+      liste = pixTrav
       for (i<-0 to pixTrav.length-1) {
-        variance += (pixTrav(i) - moyenne) * (pixTrav(i) - moyenne)
+        variance += (src(liste.head(0))(liste.head(1)) - moyenne) * (src(liste.head(0))(liste.head(1)) - moyenne)
+        liste= liste.tail
       }
       variance = variance / pixTrav.length
 
@@ -367,12 +469,24 @@ object Main {
 ///////////////////////////////////Zone de Test/////////////////////////////////
 
 
-var listeqcq= tracerSegmentInput(-1,0,13,24)
+var fileName3 : String = "whiteImg.png"
+var wrappedImage3 : ImageWrapper = new ImageWrapper(fileName3)
+var imagetest3 : Array[Array[Int]] = wrappedImage3.getImage();
 
+var listeqcq= tracerLigne(30,30,"NE",10)
+
+var center = Array.ofDim[Int](2)
+center(0) = 500
+center(1) = 500
 for (i<-0 to listeqcq.length-1) {
+  imagetest3(listeqcq.head(0))(listeqcq.head(1)) = 0xFF0000FF
   println(listeqcq.head(0),listeqcq.head(1))
   listeqcq = listeqcq.tail
 }
+wrappedImage3.saveImage("imageTrace.png")
+
+
+
 //edgeDetection(toAnalyze,matA,matB)
 
 
