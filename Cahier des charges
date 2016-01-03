@@ -36,6 +36,9 @@ Fonction conseillé:
 	
 	def edgeDetection
 
-	def traceStreets
+	def traceStreets   :
+
+		Fonction recursive sur les chemins parcouru, on va créer la matrice de chemin avec des 1 à la place de zero, puis superposée cette matrice à notre image de base.
+
 	
 	def superImpoStreets

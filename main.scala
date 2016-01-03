@@ -14,7 +14,7 @@ object Main {
     var fileName : String = "toAnalyze.jpg";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var toAnalyze : Array[Array[Int]] = wrappedImage.getImage();
-    var fileName2 : String = "testimpo.png"
+    var fileName2 : String = "contour.png"
     var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
     var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
 
@@ -281,13 +281,13 @@ object Main {
       }
     }
 
-    def calcul_cout(src:Array[Array[Int]],l:List[List[Array[Int]]]) = {
+    def calcul_cout(src:Array[Array[Int]],l:List[Array[Int]]) = {
       var liste = l
       var cout = 0.0
-      for (i<-1 to 4) {
-        cout = cout + (calculVariance(src,liste.head) / liste.head.length)
-        liste=l.tail
-      }
+
+        cout = cout + (calculVariance(src,liste) / liste.length)
+
+
     }
 
     def test_API() = {                                                          //Just a test
@@ -382,15 +382,40 @@ object Main {
       wrappedImage.saveImage(sortie);
     }
 
-    def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,DirI:Int,rigid:Int,x:Int,y:Int)  = {                                //To do
-      var north = tracerLigne(x,y,"N",10)
-      var north_east = tracerLigne(x,y,"NE",10)
-      var north_west = tracerLigne(x,y,"NW",10)
-      var east = tracerLigne(x,y,"E",10)
-      var west = tracerLigne(x,y,"W",10)
+    def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Array[Array[Int]] = {                                //To do
+      var north = tracerLigne(x,y,"N",10):::chemin
+      var north_east = tracerLigne(x,y,"NE",10):::chemin
+      var north_west = tracerLigne(x,y,"NW",10):::chemin
+      var east = tracerLigne(x,y,"E",10):::chemin
+      var west = tracerLigne(x,y,"W",10):::chemin
+      if (prof==4) {
+        var cout_north = calcul_cout(src,north)
+        var cout_east = calcul_cout(src,east)
+        var cout_north_east = calcul_cout(src,north_east)
+        var cout_north_west = calcul_cout(src,north_west)
+        var cout_west = calcul_cout(src,west)
 
-
-
+        for (i<-0 to north.length-1) {
+          matPassage(north.head(0))(north.head(1)) = 0
+          matPassage(east.head(0))(east.head(1)) = 0
+          matPassage(west.head(0))(west.head(1)) = 0
+          matPassage(north_east.head(0))(north_east.head(1)) = 0
+          matPassage(north_west.head(0))(north_west.head(1)) = 0
+          north = north.tail
+          east= east.tail
+          west = west.tail
+          north_east = north_east.tail
+          north_west = north_west.tail
+        }
+        return matPassage
+      }
+      else {
+        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north)
+        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,east.head(0),east.head(1),east)
+        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,west.head(0),west.head(1),west)
+        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north_east.head(0),north_east.head(1),north_east)
+        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north_west.head(0),north_west.head(1),north_west)
+      }
 
     }
 
@@ -471,19 +496,16 @@ object Main {
 
 var fileName3 : String = "whiteImg.png"
 var wrappedImage3 : ImageWrapper = new ImageWrapper(fileName3)
-var imagetest3 : Array[Array[Int]] = wrappedImage3.getImage();
+var matPassage : Array[Array[Int]] = wrappedImage3.getImage();
 
-var listeqcq= tracerLigne(30,30,"NE",10)
-
-var center = Array.ofDim[Int](2)
-center(0) = 500
-center(1) = 500
-for (i<-0 to listeqcq.length-1) {
-  imagetest3(listeqcq.head(0))(listeqcq.head(1)) = 0xFF0000FF
-  println(listeqcq.head(0),listeqcq.head(1))
-  listeqcq = listeqcq.tail
-}
+traceStreets(imagetest,matPassage,0,5,1,1,623,278,List())
 wrappedImage3.saveImage("imageTrace.png")
+
+
+var filename4 : String = "imageTrace.png"
+var wrappedImage4 = new ImageWrapper(filename4)
+var streets : Array[Array[Int]] = wrappedImage4.getImage()
+superImpoStreets(toAnalyze,streets)
 
 
 
