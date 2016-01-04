@@ -18,6 +18,7 @@ object Main {
     var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
     var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
 
+
     var matA = Array.ofDim[Int](3, 3)
     var matB = Array.ofDim[Int](3, 3)
     matA(0)(0) = -1
@@ -409,37 +410,38 @@ object Main {
       var tab_chemin : Array[List[Array[Int]]] = Array()
       var tab_cout : Array[Double] = Array()
       traceStreets(src,matPassage,0,5,0,1,x,y,List())
-      sort(tab_chemin,tab_cout)
 
-      if (profi == 6) {
+      /*for (j<-0 to tab_cout.length-1) {
+        println(tab_cout(j))
+      }*/
+      if (profi == 20) {
 
 
       }
 
       else {
         var copie_chemin = tab_chemin.clone
-
-        for (i<-0 to tab_chemin(0).length-1) {
-          matPassage(copie_chemin(0).head(0))(copie_chemin(0).head(1)) = 0
-          matPassage(copie_chemin(1).head(0))(copie_chemin(1).head(1)) = 0
-          matPassage(copie_chemin(2).head(0))(copie_chemin(2).head(1)) = 0
-          copie_chemin(0) = copie_chemin(0).tail
-          copie_chemin(1) = copie_chemin(1).tail
-          copie_chemin(2) = copie_chemin(2).tail
-
+        var k = 0
+        while (tab_cout(k)<1) {
+        for (i<-0 to tab_chemin(k).length-1) {
+          matPassage(copie_chemin(k).head(0))(copie_chemin(k).head(1)) = 0
+          copie_chemin(k) = copie_chemin(k).tail
         }
-
-        trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(0).head(0),tab_chemin(0).head(1),List())
-        trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(1).head(0),tab_chemin(1).head(1),List())
-        trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(2).head(0),tab_chemin(2).head(1),List())
+        k+=1
+      }
+        var j = 0
+        while (tab_cout(j)<1) {
+          trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(j).head(0),tab_chemin(j).head(1),List())
+          j+=1
+        }
       }
 
     def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {                                //To do
-      var north = tracerLigne(x,y,"N",10):::chemin
-      var north_east = tracerLigne(x,y,"NE",10):::chemin
-      var north_west = tracerLigne(x,y,"NW",10):::chemin
-      var east = tracerLigne(x,y,"E",10):::chemin
-      var west = tracerLigne(x,y,"W",10):::chemin
+      var north = tracerLigne(x,y,"N",4):::chemin
+      var north_east = tracerLigne(x,y,"NE",4):::chemin
+      var north_west = tracerLigne(x,y,"NW",4):::chemin
+      var east = tracerLigne(x,y,"E",4):::chemin
+      var west = tracerLigne(x,y,"W",4):::chemin
       if (prof==4) {
         var cout_north = calcul_cout(src,north)
         var cout_east = calcul_cout(src,east)
@@ -453,11 +455,21 @@ object Main {
         sort(tab_chemin,tab_cout)
       }
       else {
+
         traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north)
+
+        if(calcul_cout(src,east)<1) {
         traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,east.head(0),east.head(1),east)
+      }
+      if(calcul_cout(src,west)<1) {
         traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,west.head(0),west.head(1),west)
+      }
+        if(calcul_cout(src,north_east)<1) {
         traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north_east.head(0),north_east.head(1),north_east)
+      }
+      if(calcul_cout(src,north_west)<1) {
         traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north_west.head(0),north_west.head(1),north_west)
+      }
       }
 
     }
