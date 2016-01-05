@@ -156,8 +156,8 @@ object Main {
       case "SW" => var resultat : List[Array[Int]]= List()
         for (i<- 0 to long-1) {
           var cord = Array.ofDim[Int](2)
-          cord(0) = x-i
-          cord(1) = y+i
+          cord(0) = x+i
+          cord(1) = y-i
           resultat = cord::resultat
         }
 
@@ -173,117 +173,6 @@ object Main {
 
       return resultat
     }
-
-    def sort(tab_chemin: Array[List[Array[Int]]],tab_cout:Array[Double]) {
-      def swap(i: Int, j: Int) {
-        val t = tab_cout(i); tab_cout(i) = tab_cout(j); tab_cout(j) = t
-        val k = tab_chemin(i); tab_chemin(i) = tab_chemin(j); tab_chemin(j) = k
-      }
-      def sort1(l: Int, r: Int) {
-        val pivot = tab_cout((l + r) / 2)
-        var i = l; var j = r
-        while (i <= j) {
-         while (tab_cout(i) < pivot) i += 1
-         while (tab_cout(j) > pivot) j -= 1
-        if (i <= j) {
-          swap(i, j)
-          i += 1
-          j -= 1
-        }
-        }
-         if (l < j) sort1(l, j)
-         if (j < r) sort1(i, r)
-         }
-       sort1(0, tab_cout.length - 1)
-     }
-
-    def calculOctant(dx : Double, dy : Double) : Int = {
-
-      if (dy >=0) {
-        if(dx >= 0) {
-          if(dx>=dy) {
-            return 0
-          }
-          else {
-            return 1
-          }
-        }
-        else {
-          if(dy >= -dx) {
-            return 2
-          }
-          else {
-            return 3
-          }
-        }
-      }
-      else {
-        if(dx <= 0) {
-          if(dx <= dy) {
-            return 4
-          }
-          else {
-            return 5
-          }
-        }
-        else {
-          if(-dy >= dx) {
-            return 6
-          }
-          else {
-            return 7
-          }
-        }
-      }
-    }
-
-    def tracerSegmentInput(x1:Int,y1:Int,x2:Int,y2:Int) = calculOctant(x2-x1,y2-y1) match {
-      case 0 => tracerSegment(x1,y1,x2,y2)
-      case 1 => tracerSegment(x1,y1,y2,x2)
-      case 2 => tracerSegment(x1,y1,y2,-x2)
-      case 3 => tracerSegment(x1,y1,-x2,y2)
-      case 4 => tracerSegment(x1,y1,-x2,-y2)
-      case 5 => tracerSegment(x1,y1,-y2,-x2)
-      case 6 => tracerSegment(x1,y1,-y2,x2)
-      case 7 => tracerSegment(x1,y1,x2,-y2)
-    }
-
-    def tracerSegment(x1 : Int, y1 : Int, x2: Int, y2: Int) : List[Array[Int]]= { //Selon l'algorithme de Bresenham
-      var resultat : List[Array[Int]]= List()
-      var y = y1
-      var dy :Double= y2 -y1
-      var dx :Double= x2 -x1
-
-      var e = 0.0
-      var e10 : Double = dy / dx
-      var e01 = -1.0
-
-      for(x<-x1 to x2) {
-        var cord = Array.ofDim[Int](2)
-        cord(0) = x
-        cord(1) = y
-        resultat = cord :: resultat
-        //println(resultat.head(0),resultat.head(1))
-        e = e+ e10
-        if (e >= 0.5) {
-          y += 1
-          e = e + e01
-        }
-      }
-      return tracerSegmentOutput(x1,y2,y1,y2,resultat)
-    }
-
-    def tracerSegmentOutput(x1:Int,y1:Int,x2:Int,y2:Int,liste:List[Array[Int]]) = calculOctant(x2-x1,y2-y1) match {
-      case _ => reverse(liste,false,false,false)
-      case 1 => reverse(liste,true,false,false)
-      case 2 => reverse(liste,true,false,true)
-      case 3 => reverse(liste,false,true,false)
-      case 4 => reverse(liste,false,true,true)
-      case 5 => reverse(liste,true,true,true)
-      case 6 => reverse(liste,true,true,false)
-      case 7 => reverse(liste,false,false,true)
-    }
-
 
     def reverse(l : List[Array[Int]],swap:Boolean,signeX:Boolean,signeY:Boolean) : List[Array[Int]] = {
       l match {
@@ -314,23 +203,59 @@ object Main {
         return cout
     }
 
-    def test_API() = {                                                          //Just a test
-
-
-      var fileName : String = "sampleImage.jpg";
-      var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
-      var image2D : Array[Array[Int]] = wrappedImage.getImage();
-      println("The image height is: " + wrappedImage.height + " px.");
-      println("The image width is: " + wrappedImage.width + " px.");
-      for (row <- 0 to 40) {
-        for (col <-0 to 80) {
-          image2D(row)(col) = 0xFF0000FF; // Set these pixels to RGB blue
-        }
+    def sort(tab_chemin: Array[List[Array[Int]]],tab_cout:Array[Double]) {
+      def swap(i: Int, j: Int) {
+        val t = tab_cout(i); tab_cout(i) = tab_cout(j); tab_cout(j) = t
+        val k = tab_chemin(i); tab_chemin(i) = tab_chemin(j); tab_chemin(j) = k
       }
-      // Destination image file - Note that the image file name must contain the file type extension for the image to be saved correctly.
-      var outputFile : String = "outputImage.jpg";
-      // Save the result
-      wrappedImage.saveImage(outputFile);
+      def sort1(l: Int, r: Int) {
+        val pivot = tab_cout((l + r) / 2)
+        var i = l; var j = r
+        while (i <= j) {
+         while (tab_cout(i) < pivot) i += 1
+         while (tab_cout(j) > pivot) j -= 1
+        if (i <= j) {
+          swap(i, j)
+          i += 1
+          j -= 1
+        }
+        }
+         if (l < j) sort1(l, j)
+         if (j < r) sort1(i, r)
+         }
+       sort1(0, tab_cout.length - 1)
+     }
+
+    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
+
+          for (row <- 0 to background.length-1) {
+            for (col <-0 to background(0).length-1) {
+              if (street(row)(col)%powInt(16,2) == 0){
+                background(row)(col) = 0xFF0000FF
+              }
+            }
+          }
+          var outputFile : String = "superpose.png";
+          wrappedImage.saveImage(outputFile);
+        }
+
+    def calculVariance(src: Array[Array[Int]],pixTrav : List[Array[Int]]) : Double = {
+      var variance = 0.0
+      var moyenne = 0.0
+      var liste = pixTrav
+      for (i<-0 to pixTrav.length-1) {
+        moyenne += src(liste.head(0))(liste.head(1))
+        liste= liste.tail
+      }
+      moyenne = moyenne / pixTrav.length
+      liste = pixTrav
+      for (i<-0 to pixTrav.length-1) {
+        variance += (src(liste.head(0))(liste.head(1)) - moyenne) * (src(liste.head(0))(liste.head(1)) - moyenne)
+        liste= liste.tail
+      }
+      variance = variance / pixTrav.length
+
+      return variance
     }
 
     def copy (src: Array[Array[Int]]) : Array[Array[Int]] = {                    //Done
@@ -406,15 +331,15 @@ object Main {
       wrappedImage.saveImage(sortie);
     }
 
-    def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],profi:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {
+    def traceSreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],profi:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {
       var tab_chemin : Array[List[Array[Int]]] = Array()
       var tab_cout : Array[Double] = Array()
-      traceStreets(src,matPassage,0,5,0,1,x,y,List())
+      trouve_chemin(src,matPassage,0,5,0,1,x,y,List())
 
       /*for (j<-0 to tab_cout.length-1) {
         println(tab_cout(j))
       }*/
-      if (profi == 20) {
+      if (profi == 25) {
 
 
       }
@@ -431,17 +356,18 @@ object Main {
       }
         var j = 0
         while (tab_cout(j)<1) {
-          trouve_chemin(src,matPassage,profi+1,5,0,1,tab_chemin(j).head(0),tab_chemin(j).head(1),List())
+          traceSreets(src,matPassage,profi+1,5,0,1,tab_chemin(j).head(0),tab_chemin(j).head(1),List())
           j+=1
         }
       }
 
-    def traceStreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {                                //To do
-      var north = tracerLigne(x,y,"N",4):::chemin
-      var north_east = tracerLigne(x,y,"NE",4):::chemin
-      var north_west = tracerLigne(x,y,"NW",4):::chemin
-      var east = tracerLigne(x,y,"E",4):::chemin
-      var west = tracerLigne(x,y,"W",4):::chemin
+
+    def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {                                //To do
+      var north = tracerLigne(x,y,"N",10):::chemin
+      var north_east = tracerLigne(x,y,"NE",10):::chemin
+      var north_west = tracerLigne(x,y,"NW",10):::chemin
+      var east = tracerLigne(x,y,"E",10):::chemin
+      var west = tracerLigne(x,y,"W",10):::chemin
       if (prof==1) {
         var cout_north = calcul_cout(src,north)
         var cout_east = calcul_cout(src,east)
@@ -456,91 +382,25 @@ object Main {
       }
       else {
 
-        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north)
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north)
 
-        if(calcul_cout(src,east)<1) {
-        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,east.head(0),east.head(1),east)
+        if(calcul_cout(src,east)<100) {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,east.head(0),east.head(1),east)
       }
-      if(calcul_cout(src,west)<1) {
-        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,west.head(0),west.head(1),west)
+      if(calcul_cout(src,west)<100) {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,west.head(0),west.head(1),west)
       }
-        if(calcul_cout(src,north_east)<1) {
-        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north_east.head(0),north_east.head(1),north_east)
+        if(calcul_cout(src,north_east)<100) {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north_east.head(0),north_east.head(1),north_east)
       }
-      if(calcul_cout(src,north_west)<1) {
-        traceStreets(src,matPassage,prof+1,nbDir,dirI,rigid,north_west.head(0),north_west.head(1),north_west)
+      if(calcul_cout(src,north_west)<100) {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north_west.head(0),north_west.head(1),north_west)
       }
       }
 
     }
-}
+  }
 
-    def superImpoStreets(background: Array[Array[Int]], street: Array[Array[Int]]) ={
-
-          for (row <- 0 to background.length-1) {
-            for (col <-0 to background(0).length-1) {
-              if (street(row)(col)%powInt(16,2) == 0){
-                background(row)(col) = 0xFF0000FF
-              }
-            }
-          }
-          var outputFile : String = "superpose.png";
-          wrappedImage.saveImage(outputFile);
-        }
-
-
-    def conv2D(x: Array[Array[Int]],h: Array[Array[Int]]) : Array[Array[Int]] = { //Ca marche pas, c'est triste
-      var kCenterX = h.length / 2;
-      var kCenterY = h(0).length / 2;
-      var out = Array.ofDim[Int](x.length, x(0).length)
-
-      for(i<-0 to x.length-1)              // rows
-      {
-          for(j<-0 to x(0).length-1)          // columns
-          {
-              for(m<-0 to h.length-1)     // kernel rows
-              {
-                  var mm = h.length - 2 - m;      // row index of flipped kernel
-
-                  for(n<-0 to h(0).length) // kernel columns
-                  {
-                      var nn = h(0).length - 2 - n;  // column index of flipped kernel
-
-                      // index of input signal, used for checking boundary
-                      var ii = i + (m - kCenterY) -1;
-                      var jj = j + (n - kCenterX) -1;
-
-                      // ignore input samples which are out of bound
-                      if( ii >= 0 && ii < x.length-1 && jj >= 0 && jj < x(0).length-1 ) {
-                          out(i)(j) += x(ii)(jj) * h(mm)(nn);
-                      }
-                  }
-              }
-          }
-      }
-      return out
-    }
-
-
-
-    def calculVariance(src: Array[Array[Int]],pixTrav : List[Array[Int]]) : Double = {
-      var variance = 0.0
-      var moyenne = 0.0
-      var liste = pixTrav
-      for (i<-0 to pixTrav.length-1) {
-        moyenne += src(liste.head(0))(liste.head(1))
-        liste= liste.tail
-      }
-      moyenne = moyenne / pixTrav.length
-      liste = pixTrav
-      for (i<-0 to pixTrav.length-1) {
-        variance += (src(liste.head(0))(liste.head(1)) - moyenne) * (src(liste.head(0))(liste.head(1)) - moyenne)
-        liste= liste.tail
-      }
-      variance = variance / pixTrav.length
-
-      return variance
-    }
 
 
 ///////////////////////////////////Zone de Test/////////////////////////////////
@@ -550,7 +410,7 @@ var fileName3 : String = "whiteImg.png"
 var wrappedImage3 : ImageWrapper = new ImageWrapper(fileName3)
 var matPassage : Array[Array[Int]] = wrappedImage3.getImage();
 
-trouve_chemin(imagetest,matPassage,0,5,1,1,623,278,List())
+traceSreets(imagetest,matPassage,0,5,1,1,623,278,List())
 wrappedImage3.saveImage("imageTrace.png")
 
 
