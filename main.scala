@@ -11,12 +11,12 @@ object Main {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-    var fileName : String = "toAnalyze.jpg";
+    var fileName : String = "greyImage.png";
     var wrappedImage : ImageWrapper = new ImageWrapper(fileName);
     var toAnalyze : Array[Array[Int]] = wrappedImage.getImage();
-    var fileName2 : String = "contour.png"
-    var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
-    var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
+    //var fileName2 : String = "contour.png"
+    //var wrappedImage2 : ImageWrapper = new ImageWrapper(fileName2)
+    //var imagetest : Array[Array[Int]] = wrappedImage2.getImage();
 
 
     var matA = Array.ofDim[Int](3, 3)
@@ -334,20 +334,23 @@ object Main {
     def traceSreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],profi:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {
       var tab_chemin : Array[List[Array[Int]]] = Array()
       var tab_cout : Array[Double] = Array()
-      trouve_chemin(src,matPassage,0,5,0,1,x,y,List())
+      trouve_chemin(src,matPassage,0,5,0,1,x,y,List(),"yolo")
 
       /*for (j<-0 to tab_cout.length-1) {
         println(tab_cout(j))
       }*/
-      if (profi == 25) {
+      if (profi == 7 || tab_cout.length==0) {
 
 
       }
 
+
       else {
+
+
         var copie_chemin = tab_chemin.clone
         var k = 0
-        while (tab_cout(k)<1) {
+        while (tab_cout(k)<1E11) {
         for (i<-0 to tab_chemin(k).length-1) {
           matPassage(copie_chemin(k).head(0))(copie_chemin(k).head(1)) = 0
           copie_chemin(k) = copie_chemin(k).tail
@@ -355,20 +358,21 @@ object Main {
         k+=1
       }
         var j = 0
-        while (tab_cout(j)<1) {
+        while (tab_cout(j)<1E11) {
           traceSreets(src,matPassage,profi+1,5,0,1,tab_chemin(j).head(0),tab_chemin(j).head(1),List())
           j+=1
         }
       }
 
 
-    def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]]) : Unit = {                                //To do
-      var north = tracerLigne(x,y,"N",10):::chemin
-      var north_east = tracerLigne(x,y,"NE",10):::chemin
-      var north_west = tracerLigne(x,y,"NW",10):::chemin
-      var east = tracerLigne(x,y,"E",10):::chemin
-      var west = tracerLigne(x,y,"W",10):::chemin
-      if (prof==1) {
+    def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,nbDir:Int,dirI:Int,rigid:Int,x:Int,y:Int,chemin:List[Array[Int]],provenance:String) : Unit = {                                //To do
+      var long = 5
+      var north = tracerLigne(x,y,"N",long):::chemin
+      var north_east = tracerLigne(x,y,"NE",long):::chemin
+      var north_west = tracerLigne(x,y,"NW",long):::chemin
+      var east = tracerLigne(x,y,"E",long):::chemin
+      var west = tracerLigne(x,y,"W",long):::chemin
+      if (prof==4) {
         var cout_north = calcul_cout(src,north)
         var cout_east = calcul_cout(src,east)
         var cout_north_east = calcul_cout(src,north_east)
@@ -377,25 +381,29 @@ object Main {
 
         tab_cout =tab_cout ++ Array(cout_north) ++ Array(cout_east) ++ Array(cout_west) ++ Array(cout_north_west) ++ Array(cout_north_east)
         tab_chemin = tab_chemin ++ Array(north) ++ Array(east) ++ Array(west) ++ Array(north_west) ++ Array(north_east)
+        //println(tab_cout.length)
 
         sort(tab_chemin,tab_cout)
       }
       else {
+        if(calcul_cout(src,north)<1E11 && provenance != "S") {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north,"N")
+        }
 
-        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north.head(0),north.head(1),north)
 
-        if(calcul_cout(src,east)<100) {
-        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,east.head(0),east.head(1),east)
+        if(calcul_cout(src,east)<1E11 && provenance != "W") {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,east.head(0),east.head(1),east,"E")
       }
-      if(calcul_cout(src,west)<100) {
-        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,west.head(0),west.head(1),west)
+      if(calcul_cout(src,west)<1E11 && provenance != "E") {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,west.head(0),west.head(1),west,"W")
       }
-        if(calcul_cout(src,north_east)<100) {
-        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north_east.head(0),north_east.head(1),north_east)
+        if(calcul_cout(src,north_east)<1E11 && provenance != "SW") {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north_east.head(0),north_east.head(1),north_east,"NE")
       }
-      if(calcul_cout(src,north_west)<100) {
-        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north_west.head(0),north_west.head(1),north_west)
+      if(calcul_cout(src,north_west)<1E11 && provenance != "SE") {
+        trouve_chemin(src,matPassage,prof+1,nbDir,dirI,rigid,north_west.head(0),north_west.head(1),north_west,"NW")
       }
+      //print("here")
       }
 
     }
@@ -410,7 +418,7 @@ var fileName3 : String = "whiteImg.png"
 var wrappedImage3 : ImageWrapper = new ImageWrapper(fileName3)
 var matPassage : Array[Array[Int]] = wrappedImage3.getImage();
 
-traceSreets(imagetest,matPassage,0,5,1,1,623,278,List())
+traceSreets(toAnalyze,matPassage,0,5,1,1,400,278,List()) //623
 wrappedImage3.saveImage("imageTrace.png")
 
 
