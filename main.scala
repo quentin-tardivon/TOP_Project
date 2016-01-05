@@ -442,7 +442,7 @@ object Main {
       var north_west = tracerLigne(x,y,"NW",4):::chemin
       var east = tracerLigne(x,y,"E",4):::chemin
       var west = tracerLigne(x,y,"W",4):::chemin
-      if (prof==4) {
+      if (prof==1) {
         var cout_north = calcul_cout(src,north)
         var cout_east = calcul_cout(src,east)
         var cout_north_east = calcul_cout(src,north_east)
