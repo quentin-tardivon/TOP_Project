@@ -1,0 +1,5 @@
+Nous avons réalisé ce programme pour l'executer en scrypt scala. Pour le lancer, écrire dans la console, dans le dossier du projet:
+
+exec scala -classpath "./src/API/imagewrapper_2.11-1.0.0.jar" main.scala
+
+
