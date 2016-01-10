@@ -330,12 +330,12 @@ def traceSreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],profi:Int,x
     var copie_chemin = tab_chemin.clone
     var k = 0
     while (tab_cout(k)<tolerance) {
-    for (i<-0 to tab_chemin(k).length-1) {
-      matPassage(copie_chemin(k).head(0))(copie_chemin(k).head(1)) = 0
-      copie_chemin(k) = copie_chemin(k).tail
+      for (i<-0 to tab_chemin(k).length-1) {
+        matPassage(copie_chemin(k).head(0))(copie_chemin(k).head(1)) = 0
+        copie_chemin(k) = copie_chemin(k).tail
+      }
+      k+=1
     }
-    k+=1
-  }
     var j = 0
     while (tab_cout(j)<tolerance) {
       traceSreets(src,matPassage,profi+1,tab_chemin(j).head(0),tab_chemin(j).head(1),List())
@@ -344,7 +344,7 @@ def traceSreets(src: Array[Array[Int]],matPassage: Array[Array[Int]],profi:Int,x
   }
 
 
-def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,x:Int,y:Int,chemin:List[Array[Int]],provenance:String) : Unit = {                                //To do
+def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,x:Int,y:Int,chemin:List[Array[Int]],provenance:String) : Unit = {
   var long = 7
   var north = tracerLigne(x,y,"N",long):::chemin
   var north_east = tracerLigne(x,y,"NE",long):::chemin
@@ -365,22 +365,24 @@ def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,
   }
   else {
     if(calcul_cout(src,north)<tolerance && provenance != "S") {
-    trouve_chemin(src,matPassage,prof+1,north.head(0),north.head(1),north,"N")
+      trouve_chemin(src,matPassage,prof+1,north.head(0),north.head(1),north,"N")
     }
 
-
     if(calcul_cout(src,east)<tolerance && provenance != "W") {
-    trouve_chemin(src,matPassage,prof+1,east.head(0),east.head(1),east,"E")
-  }
-  if(calcul_cout(src,west)<tolerance && provenance != "E") {
-    trouve_chemin(src,matPassage,prof+1,west.head(0),west.head(1),west,"W")
-  }
+      trouve_chemin(src,matPassage,prof+1,east.head(0),east.head(1),east,"E")
+    }
+
+    if(calcul_cout(src,west)<tolerance && provenance != "E") {
+      trouve_chemin(src,matPassage,prof+1,west.head(0),west.head(1),west,"W")
+    }
+
     if(calcul_cout(src,north_east)<tolerance && provenance != "SW") {
-    trouve_chemin(src,matPassage,prof+1,north_east.head(0),north_east.head(1),north_east,"NE")
-  }
-  if(calcul_cout(src,north_west)<tolerance && provenance != "SE") {
-    trouve_chemin(src,matPassage,prof+1,north_west.head(0),north_west.head(1),north_west,"NW")
-  }
+      trouve_chemin(src,matPassage,prof+1,north_east.head(0),north_east.head(1),north_east,"NE")
+    }
+
+    if(calcul_cout(src,north_west)<tolerance && provenance != "SE") {
+      trouve_chemin(src,matPassage,prof+1,north_west.head(0),north_west.head(1),north_west,"NW")
+    }
 
   }
 
@@ -391,7 +393,7 @@ def trouve_chemin(src: Array[Array[Int]],matPassage: Array[Array[Int]],prof:Int,
 ////////////////////////////////////////////////////////////////////////////////
 
 println("Choisir un numéro d'image de 1 à 8:")
-var num = "1"//scala.io.StdIn.readLine
+var num = "1"   //scala.io.StdIn.readLine
 var filename : String = ""
 var filename2 : String = ""
 var InitX = 0
